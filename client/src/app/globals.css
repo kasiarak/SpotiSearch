@@ -1,5 +1,6 @@
 :root{
   --main-color: #212121;
+  --secondary-color: rgb(95, 93, 93); 
 }
 html,
 body {
