@@ -1,7 +1,11 @@
+:root{
+  --main-color: #212121;
+}
 html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  background-color: var(--main-color);
 }
 * {
   box-sizing: border-box;
