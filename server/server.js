@@ -28,16 +28,45 @@ const server = createServer((req, res) =>{
 
     jsonMiddleWare(req, res, async () => { 
         if (req.url === '/getArtistId' && req.method === 'POST') {
-            try {
-                const token = await getSpotifyToken();
-                
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ token }));
-            } catch (error) {
-                console.error('Error fetching Spotify token:', error);
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Internal Server Error' }));
-            }
+            let body = '';
+
+            req.on('data', chunk => {
+                body += chunk.toString();
+            });
+
+            req.on('end', async () => {
+                try {
+                    const { artistName } = JSON.parse(body);
+                    if (!artistName) {
+                        res.writeHead(400, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Artist name is required' }));
+                        return;
+                    }
+
+                    const token = await getSpotifyToken();
+
+                    const searchResponse = await fetch(`https://api.spotify.com/v1/search?q=artist:${encodeURIComponent(artistName)}&type=artist`, {
+                        method: 'GET',
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+
+                    const searchData = await searchResponse.json();
+                    const artist = searchData.artists?.items[0];
+
+                    if (!artist) {
+                        res.writeHead(404, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Artist not found' }));
+                        return;
+                    }
+
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ id: artist.id }));
+                } catch (error) {
+                    console.error('Error fetching artist ID:', error);
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                }
+            });
         } else {
             notFoundHandler(res);
         }
