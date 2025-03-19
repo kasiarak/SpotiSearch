@@ -50,7 +50,7 @@ export default function SearchBar() {
         <div>
             <div className={styles.searchBar}>
             <button onClick={searchArtist}>
-                <img src="magnifying-glass-svgrepo-com.svg" alt="Search"/>
+                <img src="/magnifying-glass-svgrepo-com.svg" alt="Search"/>
             </button>
             <input 
                 value={query} 
