@@ -13,3 +13,8 @@
   margin-top: 10vh;
   margin-bottom: 5vh;
 }
+@media screen and (max-width: 600px){
+  .page h1{
+    font-size: 3rem;
+  }
+}
