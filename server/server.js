@@ -113,6 +113,51 @@ const server = createServer((req, res) =>{
                 res.end(JSON.stringify({ error: 'Internal Server Error' }));
             }
         });
+        } else if (req.url === '/getTopTracks' && req.method === 'POST') {
+            let body = '';
+        
+            req.on('data', chunk => {
+                body += chunk.toString();
+            });
+        
+            req.on('end', async () => {
+                try {
+                    const { artistId } = JSON.parse(body);
+                    if (!artistId) {
+                        res.writeHead(400, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Artist ID is required' }));
+                        return;
+                    }
+        
+                    const token = await getSpotifyToken();
+        
+                    const tracksResponse = await fetch(`https://api.spotify.com/v1/artists/${artistId}/top-tracks`, {
+                        method: 'GET',
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+        
+                    if (!tracksResponse.ok) {
+                        res.writeHead(tracksResponse.status, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Failed to fetch top tracks' }));
+                        return;
+                    }
+        
+                    const tracksData = await tracksResponse.json();
+                    const topTracks = tracksData.tracks.map(track => ({
+                        title: track.name,
+                        album: track.album.name,
+                        albumCover: track.album.images?.length > 0 ? track.album.images[0].url : null,
+                        duration_ms: track.duration_ms,
+                    }));
+        
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify(topTracks));
+                } catch (error) {
+                    console.error('Error fetching top tracks:', error);
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                }
+            });
         } else {
             notFoundHandler(res);
         }
