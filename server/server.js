@@ -67,6 +67,52 @@ const server = createServer((req, res) =>{
                     res.end(JSON.stringify({ error: 'Internal Server Error' }));
                 }
             });
+        }else if(req.url === '/getArtistDetails' && req.method === 'POST'){
+            let body = '';
+
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+
+        req.on('end', async () => {
+            try {
+                const { artistId } = JSON.parse(body);
+                if (!artistId) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Artist ID is required' }));
+                    return;
+                }
+
+                const token = await getSpotifyToken();
+
+                const artistResponse = await fetch(`https://api.spotify.com/v1/artists/${artistId}`, {
+                    method: 'GET',
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                if (!artistResponse.ok) {
+                    res.writeHead(artistResponse.status, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Artist not found' }));
+                    return;
+                }
+
+                const artistData = await artistResponse.json();
+
+                const artistInfo = {
+                    name: artistData.name,
+                    image: artistData.images?.length > 0 ? artistData.images[0].url : null,
+                    genres: artistData.genres,
+                    followers: artistData.followers?.total || 0
+                };
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify(artistInfo));
+            } catch (error) {
+                console.error('Error fetching artist details:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+            }
+        });
         } else {
             notFoundHandler(res);
         }
