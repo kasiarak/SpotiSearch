@@ -144,6 +144,7 @@ const server = createServer((req, res) =>{
         
                     const tracksData = await tracksResponse.json();
                     const topTracks = tracksData.tracks.map(track => ({
+                        id: track.id,
                         title: track.name,
                         album: track.album.name,
                         albumCover: track.album.images?.length > 0 ? track.album.images[0].url : null,
