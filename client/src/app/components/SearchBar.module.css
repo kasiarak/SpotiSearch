@@ -1,7 +1,7 @@
 .searchBar{
     border: 1px solid var(--secondary-color);
     border-radius: 30px;
-    width: 40vw;
+    width: 650px;
     height: 50px;
     display: flex;
 }
@@ -37,4 +37,9 @@
 }
 .searchBar input:focus{
     outline: none;
+}
+.alert{
+    color: red;
+    margin-top: 5px;
+    margin-left: 25px;
 }
