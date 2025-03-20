@@ -34,6 +34,14 @@
     gap: 20px;
     text-align: center;
 }
+.events{
+    text-align: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 85vw;
+    margin-left: auto;
+    margin-right: auto;
+}
 @media screen and (max-width: 620px){
     .BasicInformation img{
         width: 100px; 

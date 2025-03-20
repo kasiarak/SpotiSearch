@@ -5,6 +5,7 @@ import styles from "./pageArtist.module.css";
 import SearchBar from "@/app/components/SearchBar";
 import Song from "@/app/components/song";
 import Album from "@/app/components/Album";
+import Event from "@/app/components/Event";
 
 export default function ArtistPage() {
     const params = useParams(); 
@@ -12,6 +13,7 @@ export default function ArtistPage() {
     const [artistData, setArtistData] = useState(null);
     const [topTracks, setTopTracks] = useState([]);
     const [albums, setAlbums] = useState([]);
+    const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
 
@@ -42,6 +44,7 @@ export default function ArtistPage() {
                 setArtistData(null);
             } else {
                 setArtistData(data);
+                fetchEvents(data.name);
             }
         } catch (error) {
             console.error("Error fetching artist details:", error);
@@ -87,6 +90,24 @@ export default function ArtistPage() {
         }
     }
 
+    async function fetchEvents(artistName) {
+        if (!artistName) return;
+        const API_URL = process.env.NEXT_PUBLIC_API_URL + "/getEvents";
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ artistName }),
+            });
+
+            if (!response.ok) throw new Error("Failed to fetch events");
+            const data = await response.json();
+            setEvents(data || []);
+        } catch (error) {
+            console.error("Error fetching events:", error);
+        }
+    }
+
     useEffect(() => {
         if (artistId) {
             fetchArtistDetails(artistId);
@@ -127,6 +148,20 @@ export default function ArtistPage() {
                             <Album key={album.id} cover={album.cover} title={album.title} release_date={album.release_date}/>
                         ))}
                     </div>
+                </>
+            )}
+            {!loading && (
+                <>
+                <h2>Upcoming Events</h2>
+                <div className={styles.events}>
+                    {events.length > 0 ? (
+                            events.map(event => (
+                            <Event key={event.id} url={event.url} name={event.name} date={event.date} vanue={event.vanue} city={event.city} country={event.country} image={event.image}/>
+                            ))
+                    ) : (
+                        <p>No upcoming events found.</p>
+                    )}
+                </div>
                 </>
             )}
         </div>

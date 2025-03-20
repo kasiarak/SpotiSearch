@@ -1,0 +1,47 @@
+.eventContainer{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--secondary-color);
+    border-radius: 15px;
+    margin-bottom: 10px;
+    width: 40vw;
+    padding: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.eventContainer img{
+    width: 300px; 
+    height: 200px; 
+    object-fit: cover;
+    margin-left: auto;
+    margin-right: auto;
+}
+.eventContainer a{
+    color: white;
+}
+.eventInfo{
+    display: flex;
+    justify-content: center;
+    text-align: left;
+    flex-direction: column;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+@media screen and (max-width: 1050px){
+    .eventContainer img{
+        width: 150px; 
+        height: 100px; 
+        object-fit: cover;
+    }
+    .eventContainer{
+        grid-template-columns: 1fr;
+    }
+}
+@media screen and (max-width: 420px){
+    .eventContainer img{
+        width: 100px; 
+        height: 50px; 
+        object-fit: cover;
+    }
+}
