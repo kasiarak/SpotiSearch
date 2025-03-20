@@ -159,6 +159,51 @@ const server = createServer((req, res) =>{
                     res.end(JSON.stringify({ error: 'Internal Server Error' }));
                 }
             });
+        } else if (req.url === '/getArtistAlbums' && req.method === 'POST') {
+            let body = '';
+        
+            req.on('data', chunk => {
+                body += chunk.toString();
+            });
+        
+            req.on('end', async () => {
+                try {
+                    const { artistId } = JSON.parse(body);
+                    if (!artistId) {
+                        res.writeHead(400, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Artist ID is required' }));
+                        return;
+                    }
+        
+                    const token = await getSpotifyToken();
+        
+                    const albumsResponse = await fetch(`https://api.spotify.com/v1/artists/${artistId}/albums?include_groups=album`, {
+                        method: 'GET',
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+        
+                    if (!albumsResponse.ok) {
+                        res.writeHead(albumsResponse.status, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Failed to fetch artist albums' }));
+                        return;
+                    }
+        
+                    const albumsData = await albumsResponse.json();
+                    const albums = albumsData.items.map(album => ({
+                        id: album.id,
+                        title: album.name,
+                        cover: album.images?.length > 0 ? album.images[0].url : null,
+                        release_date: album.release_date
+                    }));
+        
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify(albums));
+                } catch (error) {
+                    console.error('Error fetching artist albums:', error);
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                }
+            });
         } else {
             notFoundHandler(res);
         }
