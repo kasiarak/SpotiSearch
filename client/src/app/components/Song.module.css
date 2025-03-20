@@ -22,3 +22,18 @@
 .songContainer h2{
     margin-left: 4vw;
 }
+@media screen and (max-width: 620px){
+    .songContainer img{
+        width: 60px;
+        height: 60px;
+    }
+}
+@media screen and (max-width: 450px){
+    .songContainer{
+        grid-template-columns: 1fr 1fr;
+        height: 250px;
+    }
+    .songContainer h2{
+        margin-left: 0;
+    }
+}

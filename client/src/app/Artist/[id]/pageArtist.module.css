@@ -21,6 +21,7 @@
 .BasicInformation{
     display: flex;
     align-items: center;
+    margin-left: 2vw;
 }
 .artistPage h2{
     text-align: center;
@@ -31,11 +32,15 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 20px;
+    text-align: center;
 }
-@media screen and (max-width: 600px){
+@media screen and (max-width: 620px){
     .BasicInformation img{
         width: 100px; 
         height: 100px; 
         margin-top: 15px;
+    }
+    .albumsContainer{
+        grid-template-columns: 1fr 1fr;
     }
 }
