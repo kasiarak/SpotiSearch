@@ -27,6 +27,11 @@
         width: 60px;
         height: 60px;
     }
+    .songContainer h2,
+    .songContainer h3,
+    .songContainer p {
+        font-size: 80%;
+    }
 }
 @media screen and (max-width: 450px){
     .songContainer{
