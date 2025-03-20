@@ -159,7 +159,7 @@ export default function ArtistPage() {
                             <Event key={event.id} url={event.url} name={event.name} date={event.date} vanue={event.vanue} city={event.city} country={event.country} image={event.image}/>
                             ))
                     ) : (
-                        <p>No upcoming events found.</p>
+                        <p className={styles.noEventFoundAlert}>No upcoming events found.</p>
                     )}
                 </div>
                 </>
