@@ -4,6 +4,7 @@ import getSpotifyToken from './utils/spotify.js';
 
 dotenv.config();
 const PORT = process.env.PORT;
+const TICKETMASTER_API_KEY = process.env.TICKETMASTER_API_KEY;
 
 const jsonMiddleWare = (req, res, next) => {
     res.setHeader('Content-Type', 'application/json');
@@ -204,6 +205,52 @@ const server = createServer((req, res) =>{
                     res.end(JSON.stringify({ error: 'Internal Server Error' }));
                 }
             });
+        } else if (req.url === '/getEvents' && req.method === 'POST') {
+                let body = '';
+    
+                req.on('data', chunk => {
+                    body += chunk.toString();
+                });
+    
+                req.on('end', async () => {
+                    try {
+                        const { artistName } = JSON.parse(body);
+                        if (!artistName) {
+                            res.writeHead(400, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ error: 'Artist name is required' }));
+                            return;
+                        }
+    
+                        const TM_API_URL = `https://app.ticketmaster.com/discovery/v2/events.json?keyword=${encodeURIComponent(artistName)}&apikey=${TICKETMASTER_API_KEY}`;
+    
+                        const eventsResponse = await fetch(TM_API_URL, { method: 'GET' });
+    
+                        if (!eventsResponse.ok) {
+                            res.writeHead(eventsResponse.status, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ error: 'Failed to fetch events' }));
+                            return;
+                        }
+    
+                        const eventsData = await eventsResponse.json();
+                        const events = eventsData._embedded?.events.map(event => ({
+                            id: event.id,
+                            name: event.name || null,
+                            date: event.dates?.start?.localDate ?? null,
+                            venue: event._embedded?.venues?.[0]?.name ?? null,
+                            city: event._embedded?.venues?.[0]?.city?.name ?? null,
+                            country: event._embedded?.venues?.[0]?.country?.name ?? null,
+                            url: event.url ?? null,
+                            image: event.images?.length > 0 ? event.images[0].url : null
+                        })) || [];
+    
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify(events));
+                    } catch (error) {
+                        console.error('Error fetching events:', error);
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                    }
+                });
         } else {
             notFoundHandler(res);
         }
