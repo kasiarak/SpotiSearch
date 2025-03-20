@@ -4,12 +4,14 @@ import { useParams } from "next/navigation";
 import styles from "./pageArtist.module.css";
 import SearchBar from "@/app/components/SearchBar";
 import Song from "@/app/components/song";
+import Album from "@/app/components/Album";
 
 export default function ArtistPage() {
     const params = useParams(); 
     const artistId = params?.id; 
     const [artistData, setArtistData] = useState(null);
     const [topTracks, setTopTracks] = useState([]);
+    const [albums, setAlbums] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
 
@@ -67,10 +69,29 @@ export default function ArtistPage() {
         }
     }
 
+    async function fetchAlbums(artistId) {
+        if (!artistId) return;
+        const API_URL = process.env.NEXT_PUBLIC_API_URL + "/getArtistAlbums";
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ artistId }),
+            });
+
+            if (!response.ok) throw new Error("Failed to fetch albums");
+            const data = await response.json();
+            setAlbums(data || []);
+        } catch (error) {
+            console.error("Error fetching albums:", error);
+        }
+    }
+
     useEffect(() => {
         if (artistId) {
             fetchArtistDetails(artistId);
             fetchTopTracks(artistId);
+            fetchAlbums(artistId);
         }
     }, [artistId]);
 
@@ -97,6 +118,16 @@ export default function ArtistPage() {
                         <Song key={track.id} id={index+1} title={track.title} album={track.album} albumCover={track.albumCover} duration={track.duration_ms}/>
                     ))}
                 </div>
+            )}
+            {!loading && albums.length > 0 && (
+                <>
+                    <h2>Albums</h2>
+                    <div className={styles.albumsContainer}>
+                        {albums.map(album => (
+                            <Album key={album.id} cover={album.cover} title={album.title} release_date={album.release_date}/>
+                        ))}
+                    </div>
+                </>
             )}
         </div>
     );
