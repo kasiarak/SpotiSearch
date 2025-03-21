@@ -150,20 +150,20 @@ export default function ArtistPage() {
                     </div>
                 </>
             )}
-            {!loading && (
-                <>
-                <h2>Upcoming Events</h2>
-                <div className={styles.events}>
-                    {events.length > 0 ? (
-                            events.map(event => (
-                            <Event key={event.id} url={event.url} name={event.name} date={event.date} vanue={event.vanue} city={event.city} country={event.country} image={event.image}/>
-                            ))
-                    ) : (
-                        <p className={styles.noEventFoundAlert}>No upcoming events found.</p>
-                    )}
-                </div>
-                </>
+{!loading && !error && (
+    <>
+        <h2>Upcoming Events</h2>
+        <div className={styles.events}>
+            {events.length > 0 ? (
+                events.map(event => (
+                    <Event key={event.id} url={event.url} name={event.name} date={event.date} vanue={event.vanue} city={event.city} country={event.country} image={event.image}/>
+                ))
+            ) : (
+                <p className={styles.noEventFoundAlert}>No upcoming events found.</p>
             )}
+        </div>
+    </>
+)}
         </div>
     );
 }
