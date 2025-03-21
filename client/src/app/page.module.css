@@ -13,6 +13,27 @@
   margin-top: 10vh;
   margin-bottom: 5vh;
 }
+.infoContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; 
+  color: white;
+  position: absolute;
+  margin-left: auto;
+  margin-right: auto;
+  bottom: 10px;
+}
+.infoBox {
+  text-align: center;
+  width: 30vw;
+  padding: 10px;
+}
+.separator {
+  width: 1px; 
+  height: 20vh; 
+  background-color: var(--secondary-color);
+}
 @media screen and (max-width: 600px){
   .page h1{
     font-size: 3rem;
